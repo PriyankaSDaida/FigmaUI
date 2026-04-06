@@ -40,14 +40,14 @@ graph TD
 
     %% Next.js API Tier
     subgraph Backend [Next.js API Routes]
-        AnalyzeAPI[/api/analyze]
-        GenerateAPI[/api/generate]
+        AnalyzeAPI["/api/analyze"]
+        GenerateAPI["/api/generate"]
     end
 
     %% AI Tier
     subgraph AI [Google Cloud AI]
-        Vision[Gemini 2.0 Flash Vision]
-        LLM[Gemini 2.0 Flash CodeGen]
+        Vision["Gemini 2.0 Flash Vision"]
+        LLM["Gemini 2.0 Flash CodeGen"]
     end
 
     %% Data Flow
