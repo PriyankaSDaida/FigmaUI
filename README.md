@@ -28,6 +28,43 @@ Tired of manually translating high-fidelity mockups into front-end code? **Figma
 
 This application is built with a decoupled API approach inside a Next.js App Router monolith, ensuring rapid development and seamless deployments.
 
+```mermaid
+graph TD
+    %% Client Tier
+    subgraph Client [Frontend UI]
+        Upload[Upload Zone]
+        Store[Zustand State]
+        Prev[Live Preview]
+        Code[Syntax Highlight Panel]
+    end
+
+    %% Next.js API Tier
+    subgraph Backend [Next.js API Routes]
+        AnalyzeAPI[/api/analyze]
+        GenerateAPI[/api/generate]
+    end
+
+    %% AI Tier
+    subgraph AI [Google Cloud AI]
+        Vision[Gemini 2.0 Flash Vision]
+        LLM[Gemini 2.0 Flash CodeGen]
+    end
+
+    %% Data Flow
+    Upload -- "1. POST Image" --> AnalyzeAPI
+    AnalyzeAPI -- "2. Analyze structure" --> Vision
+    Vision -- "3. Structured JSON" --> AnalyzeAPI
+    AnalyzeAPI -- "4. Return mapping" --> Store
+    
+    Store -- "5. POST Context" --> GenerateAPI
+    GenerateAPI -- "6. Generate TSX" --> LLM
+    LLM -- "7. Output files" --> GenerateAPI
+    GenerateAPI -- "8. Return Code" --> Store
+    
+    Store --> Code
+    Store --> Prev
+```
+
 ### Tech Stack
 - **Frontend Framework:** Next.js 14 App Router, React 18
 - **Styling:** Tailwind CSS + custom design system variables
