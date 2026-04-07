@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { Copy, Download, FolderGit2, GalleryVerticalEnd, Layers, LayoutTemplate, Settings2, Code2 } from "lucide-react";
+import {
+  Code2,
+  FolderGit2,
+  GalleryVerticalEnd,
+  Layers,
+  LayoutTemplate,
+  Settings2,
+} from "lucide-react";
 
 export function Sidebar() {
   return (
