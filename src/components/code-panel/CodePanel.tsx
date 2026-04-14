@@ -1,42 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Download, RefreshCw, Layout, Code2, MonitorPlay, Palette } from "lucide-react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { Copy, Download, RefreshCw, Layout, Code2, MonitorPlay, Palette, Loader2 } from "lucide-react";
 import HeroSection from "@/components/generated/HeroSection";
+import { useGeneratorStore } from "@/store/useGeneratorStore";
 
 export function CodePanel() {
   const [activeTab, setActiveTab] = useState<"preview" | "code" | "components" | "tokens">("code");
   const [framework, setFramework] = useState<"react" | "nextjs">("react");
+  const { results, activeResultIndex, status } = useGeneratorStore();
 
-  const mockCode = `export default function HeroSection() {
-  return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-background border-b border-border">
-      <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center space-y-4 text-center">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-              Design to Code in Seconds
-            </h1>
-            <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-              Upload your Figma designs and let our AI generate clean, maintainable React and Next.js code tailored to your design system.
-            </p>
-          </div>
-          <div className="space-x-4">
-            <button className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-2 rounded-md font-medium transition-colors shadow-[0_0_15px_rgba(124,58,237,0.3)]">
-              Get Started
-            </button>
-            <button className="border border-border bg-card hover:bg-white/5 text-foreground px-6 py-2 rounded-md font-medium transition-colors">
-              Documentation
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-`;
+  const generatedCode = results[activeResultIndex]?.code || "// Upload a screenshot and click Generate Code to see the magic happen!";
+  const isLoading = status === "loading";
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -58,9 +33,13 @@ export function CodePanel() {
         </div>
         <div className="flex items-center gap-2">
           <button className="p-2 text-muted-foreground hover:text-foreground hover:bg-white/10 rounded-md transition-colors" title="Regenerate">
-            <RefreshCw size={18} />
+            <RefreshCw size={18} className={isLoading ? "animate-spin" : ""} />
           </button>
-          <button className="p-2 text-muted-foreground hover:text-foreground hover:bg-white/10 rounded-md transition-colors" title="Copy Code">
+          <button 
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-white/10 rounded-md transition-colors" 
+            title="Copy Code"
+            onClick={() => navigator.clipboard.writeText(generatedCode)}
+          >
             <Copy size={18} />
           </button>
           <button className="p-2 text-muted-foreground hover:text-foreground hover:bg-white/10 rounded-md transition-colors" title="Download ZIP">
@@ -80,17 +59,24 @@ export function CodePanel() {
       {/* Content Area */}
       <div className="flex-1 overflow-auto bg-[#0f0f15]">
         {activeTab === "code" && (
-          <SyntaxHighlighter
-            language="tsx"
-            style={vscDarkPlus}
-            customStyle={{ margin: 0, padding: "1.5rem", background: "transparent" }}
-            CodeTag="div"
-          >
-            {mockCode}
-          </SyntaxHighlighter>
+          isLoading ? (
+            <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+              <Loader2 className="w-8 h-8 animate-spin mb-4 text-primary" />
+              <p>Analyzing design and writing code...</p>
+            </div>
+          ) : (
+            <div className="p-6 h-full overflow-auto text-sm text-gray-300 font-mono">
+              <pre><code>{generatedCode}</code></pre>
+            </div>
+          )
         )}
         {activeTab === "preview" && (
-          <div className="h-full w-full bg-background overflow-auto p-4 border border-border/50 rounded-lg shadow-inner m-4 max-w-[calc(100%-2rem)]">
+          <div className="h-full w-full bg-background overflow-auto p-4 border border-border/50 rounded-lg shadow-inner m-4 max-w-[calc(100%-2rem)] relative">
+            {isLoading && (
+              <div className="absolute inset-0 z-10 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </div>
+            )}
             <HeroSection />
           </div>
         )}
